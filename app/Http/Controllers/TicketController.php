@@ -213,11 +213,12 @@ class TicketController extends Controller
 //     return view("tickets.serviceTicket", compact('tickets', 'status'));
 // }
 
-public function serviceTickets(Request $request)
+public function serviceTickets(Request $request,$userid = null)
 {
     $status = $request->query('status'); // open, request_for_cancellation, etc.
     $today = now()->toDateString();
     $user = auth()->user();
+    if(!is_null($userid)){ $user = User::findOrFail($userid);  }
     $userRole = $user->role->role_name ?? null;
 
     // Base query with selected columns
@@ -751,6 +752,36 @@ public function serviceticketsdestroy($id)
     $ticket->delete(); // Soft delete
 
     return redirect()->back()->with('success', 'Ticket deleted successfully.');
+}
+
+//TechnicianList with ticketstatus
+public function technicianList(){
+
+    $subQuery = DB::table('service_tickets as st')
+                ->select(
+                    'st.technician',
+                    'st.status',
+                    DB::raw('COUNT(st.id) as status_count')
+                )
+                ->groupBy('st.technician', 'st.status');
+
+    $ticketsList = DB::table(DB::raw("({$subQuery->toSql()}) as t"))
+            ->mergeBindings($subQuery)
+            ->join('users as u', 'u.id', '=', 't.technician')
+            ->join('service_statuses as ss', 'ss.name', '=', 't.status')
+            ->select(
+                'u.id as technician_id',
+                'u.name as technician_name',
+                DB::raw("GROUP_CONCAT(CONCAT(ss.name, '-', t.status_count) SEPARATOR ', ') as total_tickets")
+            )
+            ->groupBy('u.id', 'u.name')
+           ->get();
+
+    $statuses = ServiceStatus::select('id','name')
+                                ->where('is_active', true)
+                                ->orderBy('name')
+                                ->get();  
+        return view('tickets.technicianTickets',compact('statuses','ticketsList'));
 }
 
 

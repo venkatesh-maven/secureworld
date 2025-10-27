@@ -42,7 +42,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/tickets/{id}', [TicketController::class, 'update'])->name('tickets.update');
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy'])->name('tickets.destroy');
     
-Route::get('tickets/serviceTickets', [TicketController::class, 'serviceTickets'])->name('tickets.serviceTickets');
+    Route::get('tickets/serviceTickets', [TicketController::class, 'serviceTickets'])->name('tickets.serviceTickets');
+    Route::get('tickets/serviceTickets/{id}', [TicketController::class, 'serviceTickets'])->name('tickets.technicianServiceTickets');
 
     
 Route::get('tickets/serviceTicketsimport', [TicketController::class, 'serviceTicketsimport'])->name('tickets.serviceTicketsimport');
@@ -58,6 +59,8 @@ Route::get('/tickets/export', [App\Http\Controllers\TicketController::class, 'ex
 
 Route::get('/servicetickets/{ticket}/edit', [TicketController::class, 'serviceedit'])->name('tickets.serviceedit');
 Route::put('/servicetickets/{ticket}', [TicketController::class, 'serviceupdate'])->name('tickets.serviceupdate');
+
+Route::get('tickets/technicianList',[TicketController::class,'technicianList'])->name('tickets.technicianTicketReport');
 
 
 });

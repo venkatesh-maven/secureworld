@@ -505,7 +505,22 @@
             </a>
         </li>
     </ul>
-</li>         
+</li> 
+
+<!-- Reports -->
+  <li class="nav-main-item">
+    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+        <i class="nav-main-link-icon fa-solid fa-chart-column"></i> 
+        <span class="nav-main-link-name">Reports</span>
+    </a>
+      <ul class="nav-main-submenu">
+        <li class="nav-main-item">
+            <a class="nav-main-link" href="{{ route('tickets.technicianTicketReport') }}">
+                <span class="nav-main-link-name">Technician List</span>
+            </a>
+        </li>
+    </ul>
+  </li>
           </div>
           <!-- END Side Navigation -->
         </div>
