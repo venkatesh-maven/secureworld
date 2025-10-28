@@ -43,8 +43,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy'])->name('tickets.destroy');
     
     Route::get('tickets/serviceTickets', [TicketController::class, 'serviceTickets'])->name('tickets.serviceTickets');
-    Route::get('tickets/serviceTickets/{id}', [TicketController::class, 'serviceTickets'])->name('tickets.technicianServiceTickets');
-
     
 Route::get('tickets/serviceTicketsimport', [TicketController::class, 'serviceTicketsimport'])->name('tickets.serviceTicketsimport');
 
@@ -61,7 +59,7 @@ Route::get('/servicetickets/{ticket}/edit', [TicketController::class, 'serviceed
 Route::put('/servicetickets/{ticket}', [TicketController::class, 'serviceupdate'])->name('tickets.serviceupdate');
 
 Route::get('tickets/technicianList',[TicketController::class,'technicianList'])->name('tickets.technicianTicketReport');
-
+Route::get('tickets/serviceTickets/{id}/{status}',[TicketController::class,'getUserCategoryTickets']);
 
 });
 

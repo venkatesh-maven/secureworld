@@ -213,12 +213,11 @@ class TicketController extends Controller
 //     return view("tickets.serviceTicket", compact('tickets', 'status'));
 // }
 
-public function serviceTickets(Request $request,$userid = null)
+public function serviceTickets(Request $request)
 {
     $status = $request->query('status'); // open, request_for_cancellation, etc.
     $today = now()->toDateString();
     $user = auth()->user();
-    if(!is_null($userid)){ $user = User::findOrFail($userid);  }
     $userRole = $user->role->role_name ?? null;
 
     // Base query with selected columns
@@ -772,6 +771,7 @@ public function technicianList(){
             ->select(
                 'u.id as technician_id',
                 'u.name as technician_name',
+                  DB::raw('SUM(t.status_count) as total'),
                 DB::raw("GROUP_CONCAT(CONCAT(ss.name, '-', t.status_count) SEPARATOR ', ') as total_tickets")
             )
             ->groupBy('u.id', 'u.name')
@@ -784,6 +784,20 @@ public function technicianList(){
         return view('tickets.technicianTickets',compact('statuses','ticketsList'));
 }
 
+//ticketDetails
+public function getUserCategoryTickets($technician_id,$cat_id){
+    if (strpos($cat_id, '_') !== false) {
+    $cat_id = str_replace('_', ' ', $cat_id);
+}
+            
+    $tickets = serviceTickets::select('service_id','sold_to_party AS customer_info','age','mobile','order_type','created_on','user_status','category AS product_category','product as product_description',
+                                'site_code','call_bifurcation','changed_on','sla','field_category AS field_group','deferment_date','call_completion_date','comments','updated_at  AS last_updated_on','part_required')
+                               ->where('technician',$technician_id)
+                               ->where('status',$cat_id)
+                               ->get();
+                              // dd($tickets->toSql());
+    return response()->json($tickets);
+}
 
 }
 
