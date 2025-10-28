@@ -43,6 +43,9 @@
                             
                             $statusCounts =[]; 
                             $statusCounts['grand_total'] = 0;
+                            $statusCounts['Closed'] =[];
+                            $statusCounts['Defective Part Return'] =[];
+
                         @endphp
                             @foreach($statuses as $status)
                                @php  
@@ -146,9 +149,15 @@ $(document).ready(function () {
                 console.log('response is '+tickets);
                 if (tickets.length > 0) {
                     $.each(tickets, function(index, ticket) {
+
+                         const serviceEditUrl = "{{ route('tickets.serviceedit', ':id') }}"; // placeholder for ID
+
                         $('#modelTable tbody').append(`
                             <tr>
-                                <td>${ticket.service_id}</td>
+                                <td> <a href="${serviceEditUrl.replace(':id', ticket.id)}" class="text-decoration-none">
+                                        ${ticket.service_id}
+                                    </a>
+                                </td>
                                 <td>${ticket.customer_info}</td>
                                 <td>${ticket.age}</td>
                                 <td>${ticket.mobile}</td>
@@ -201,7 +210,7 @@ $(document).ready(function () {
         <div class="table-responsive" style="max-height: 72vh; overflow-y: auto;">
             <table class="table table-striped" id="modelTable">
             <thead>
-                <tr>
+                <tr style="position:sticky;top:0;z-index:2">
                     <th>Service ID</th>
                     <th>Customer Info</th>
                     <th>Age (Days)</th>

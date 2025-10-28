@@ -779,7 +779,8 @@ public function technicianList(){
 
     $statuses = ServiceStatus::select('id','name')
                                 ->where('is_active', true)
-                                ->orderBy('name')
+                                ->whereNotIN('name',["Closed","Defective Part Return"])
+                                ->orderBy('name') 
                                 ->get();  
         return view('tickets.technicianTickets',compact('statuses','ticketsList'));
 }
@@ -787,11 +788,12 @@ public function technicianList(){
 //ticketDetails
 public function getUserCategoryTickets($technician_id,$cat_id){
     if (strpos($cat_id, '_') !== false) {
-    $cat_id = str_replace('_', ' ', $cat_id);
-}
-            
-    $tickets = serviceTickets::select('service_id','sold_to_party AS customer_info','age','mobile','order_type','created_on','user_status','category AS product_category','product as product_description',
-                                'site_code','call_bifurcation','changed_on','sla','field_category AS field_group','deferment_date','call_completion_date','comments','updated_at  AS last_updated_on','part_required')
+        $cat_id = str_replace('_', ' ', $cat_id);
+    }
+    $tickets = serviceTickets::select('id','service_id','sold_to_party AS customer_info', DB::raw("DATEDIFF(CURDATE(), created_on) as age"),
+                                       'mobile','order_type','created_on','user_status','category AS product_category','product as product_description',
+                                       'site_code','call_bifurcation','changed_on','sla','field_category AS field_group','deferment_date','call_completion_date',
+                                       'comments','updated_at  AS last_updated_on','part_required')
                                ->where('technician',$technician_id)
                                ->where('status',$cat_id)
                                ->get();
