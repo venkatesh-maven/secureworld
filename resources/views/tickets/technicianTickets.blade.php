@@ -1,5 +1,5 @@
 @extends('layouts.master')
-
+@section('title','Technician TicketsList')
 @section('content')
 <style>
     .importserviceform{
@@ -58,38 +58,41 @@
                 </thead>
 
                 <tbody>
-                    
-                    @foreach($ticketsList as $index => $ticket)
-                        @php
-                           $counts = [];
-                            foreach(explode(',', $ticket->total_tickets) as $item){
-                                $item = trim($item);
-                                [$name, $count] = explode('-', $item);
-                                $counts[$name] = (int)$count;
-                              
-                                    $statusCounts[$name] = (int)$statusCounts[$name]+(int)$count;
-                                    $statusCounts['grand_total'] = $statusCounts['grand_total']+(int)$ticket->total;
-                            }
-                        @endphp
-                            
-                        <tr class="text-center" data-user="{{$ticket->technician_id}}">
-                           <!-- <td>{{ $loop->iteration }}</td> -->
-                            <td class="fw-bold">{{ $ticket->technician_name }}</td>
-                            
-                            @foreach($statuses as $status)
-                                  @php $statusId = $statusList[$status->name]; @endphp
-                                <td style="cursor:pointer"data-status="{{$status->name}}" class="technician">{{ $counts[$status->name] ?? 0 }}</td>
-                            @endforeach
-                            <td class="text-end">{{$ticket->total}}</td>   
+                    @if(!$ticketsList->isEmpty())
+                        @foreach($ticketsList as $index => $ticket)
+                            @php
+                            $counts = [];
+                                foreach(explode(',', $ticket->total_tickets) as $item){
+                                    $item = trim($item);
+                                    [$name, $count] = explode('-', $item);
+                                    $counts[$name] = (int)$count;
+                                
+                                        $statusCounts[$name] = (int)$statusCounts[$name]+(int)$count;
+                                        $statusCounts['grand_total'] = $statusCounts['grand_total']+(int)$ticket->total;
+                                }
+                            @endphp
+                                
+                            <tr class="text-center" data-user="{{$ticket->technician_id}}">
+                            <!-- <td>{{ $loop->iteration }}</td> -->
+                                <td class="fw-bold">{{ $ticket->technician_name }}</td>
+                                
+                                @foreach($statuses as $status)
+                                    @php $statusId = $statusList[$status->name]; @endphp
+                                    <td style="cursor:pointer"data-status="{{$status->name}}" class="technician">{{ $counts[$status->name] ?? 0 }}</td>
+                                @endforeach
+                                <td class="text-end">{{$ticket->total}}</td>   
+                            </tr>
+                        @endforeach
+                        <tr class="text-nowrap text-center">
+                            <th>Total</th>
+                                @foreach($statuses as $status)
+                                    <th>{{ $statusCounts[$status->name] }}</th>
+                                @endforeach
+                                <th class="text-end">{{ $statusCounts['grand_total']}}</th>                        
                         </tr>
-                    @endforeach
-                     <tr class="text-nowrap text-center">
-                        <th>Total</th>
-                            @foreach($statuses as $status)
-                                <th>{{ $statusCounts[$status->name] }}</th>
-                            @endforeach
-                            <th class="text-end">{{ $statusCounts['grand_total']}}</th>                        
-                    </tr>
+                    @else
+                        <tr><td colspan="4">No Tickets Found</td></tr>
+                    @endif            
                 </tbody>
             </table>
         </div>
@@ -125,7 +128,7 @@
     }
 
     .modal-body {
-        max-height: 75vh; /* scrollable content area */
+        max-height: 90vh; /* scrollable content area */
         overflow-y: auto;
     }
 </style>

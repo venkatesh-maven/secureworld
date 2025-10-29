@@ -756,6 +756,8 @@ public function serviceticketsdestroy($id)
 //TechnicianList with ticketstatus
 public function technicianList(){
 
+    $user = Auth()->user();
+    $userRole = $user->role->role_name ?? null;
     $subQuery = DB::table('service_tickets as st')
                 ->select(
                     'st.technician',
@@ -767,15 +769,19 @@ public function technicianList(){
     $ticketsList = DB::table(DB::raw("({$subQuery->toSql()}) as t"))
             ->mergeBindings($subQuery)
             ->join('users as u', 'u.id', '=', 't.technician')
-            ->join('service_statuses as ss', 'ss.name', '=', 't.status')
-            ->select(
+            ->join('service_statuses as ss', 'ss.name', '=', 't.status');
+              if ($userRole === 'technician') {
+                $ticketsList->where('u.id', $user->id);
+            }
+    $ticketsList = $ticketsList->select(
                 'u.id as technician_id',
                 'u.name as technician_name',
                   DB::raw('SUM(t.status_count) as total'),
                 DB::raw("GROUP_CONCAT(CONCAT(ss.name, '-', t.status_count) SEPARATOR ', ') as total_tickets")
             )
             ->groupBy('u.id', 'u.name')
-           ->get();
+            //dd($ticketsList->toSql());
+            ->get();
 
     $statuses = ServiceStatus::select('id','name')
                                 ->where('is_active', true)
